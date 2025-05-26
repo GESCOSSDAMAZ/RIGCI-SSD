@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Explorador Jerárquico Dinámico desde JSON</title>
+<style>
+  ul {
+    list-style-type: none;
+    padding-left: 20px;
+  }
+  .caret {
+    cursor: pointer;
+    user-select: none;
+  }
+  .caret::before {
+    content: "▶";
+    display: inline-block;
+    margin-right: 6px;
+    transition: transform 0.2s ease;
+  }
+  .caret-down::before {
+    transform: rotate(90deg);
+  }
+  .nested {
+    display: none;
+  }
+  .active {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<h2>Explorador Jerárquico Dinámico desde JSON</h2>
+<div id="treeContainer"></div>
+
+<script>
+// Ejemplo de datos jerárquicos en JSON
+const data = [
+  {
+    name: "Frutas",
+    children: [
+      { name: "Manzana" },
+      { name: "Banana" },
+      { 
+        name: "Cítricos", 
+        children: [
+          { name: "Naranja" },
+          { name: "Limón" },
+          { name: "Lima" }
+        ] 
+      }
+    ]
+  },
+  {
+    name: "Verduras",
+    children: [
+      { name: "Lechuga" },
+      { name: "Tomate" },
+      { name: "Zanahoria" }
+    ]
+  },
+  { name: "Pan" }
+];
+
+// Función para crear árbol HTML desde JSON
+function createTree(container, nodes) {
+  const ul = document.createElement('ul');
+  nodes.forEach(node => {
+    const li = document.createElement('li');
+    if (node.children && node.children.length > 0) {
+      const span = document.createElement('span');
+      span.classList.add('caret');
+      span.textContent = node.name;
+      li.appendChild(span);
+      const childUl = createTree(null, node.children);
+      childUl.classList.add('nested');
+      li.appendChild(childUl);
+    } else {
+      li.textContent = node.name;
+    }
+    ul.appendChild(li);
+  });
+  if(container) container.appendChild(ul);
+  return ul;
+}
+
+const treeContainer = document.getElementById('treeContainer');
+createTree(treeContainer, data);
+
+// Agregar evento para togglear hijos
+treeContainer.addEventListener('click', function(e) {
+  if(e.target.classList.contains('caret')) {
+    e.target.parentElement.querySelector('.nested').classList.toggle('active');
+    e.target.classList.toggle('caret-down');
+  }
+});
+</script>
+
+</body>
+</html>
